@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <limits.h>
 
-//Sono un update
+//Sono un update prova
 
 void merge(int *A, int start, int center,int end, int *num_op);
 void merge_sort(int *A, int start, int end, int *num_op);
