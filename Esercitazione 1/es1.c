@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <limits.h>
 
+//Sono un update
+
 void merge(int *A, int start, int center,int end, int *num_op);
 void merge_sort(int *A, int start, int end, int *num_op);
 
