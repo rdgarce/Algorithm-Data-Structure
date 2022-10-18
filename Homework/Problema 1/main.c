@@ -15,15 +15,18 @@ int main(void){
         char buf[SIZE];
         scanf("%[^\n]",buf);
         scanf("%c",&temp);
-        add(list,createNode(buf));
+        append(list,createNode(buf));
     }
     
     printf("La lista e': ");
     printList(list);
 
-    if (mirrorList(list,0) != -1){
+    int result = mirrorList(list,LIST_SIZE/2 +1);
+    if (result != -1){
         printf("La nuova lista e': ");
         printList(list);
+        printf("E si sono scambiati di posizione %d elementi\n",result);
+        
     }
     else
     {
