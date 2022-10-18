@@ -1,31 +1,35 @@
 #include "ll.c"
 #include <stdio.h>
 
+#define SIZE 128
+#define LIST_SIZE 6
+
 int main(void){
 
-    llHead head = NULL;
+    char temp;
 
-    llHead temp = head;
+    LinkedList *list = createEmptyList();
 
-    for (size_t i = 0; i < 10; i++)
-    {   
-
-        if (!head)
-        {   
-            head = createNode("ciao");
-            temp = head;
-        }
-        else
-        {
-            temp->next = createNode("ciao");
-            temp = temp->next;
-        }
-        
-
-
+    for (size_t i = 0; i < LIST_SIZE; i++)
+    {
+        char buf[SIZE];
+        scanf("%[^\n]",buf);
+        scanf("%c",&temp);
+        add(list,createNode(buf));
     }
+    
+    printf("La lista e': ");
+    printList(list);
 
-    printList(head);
+    if (mirrorList(list,0) != -1){
+        printf("La nuova lista e': ");
+        printList(list);
+    }
+    else
+    {
+        printf("Errore\n");
+    }
+    
 
-
+    
 }

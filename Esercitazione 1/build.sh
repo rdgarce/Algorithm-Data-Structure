@@ -1,2 +1,2 @@
 gcc -o esercizio es1.c
-./esercizio
+./esercizio.exe
