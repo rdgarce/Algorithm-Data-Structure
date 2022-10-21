@@ -4,17 +4,15 @@
 
 int main(){
 
-    int vet[] = {1,1, 2, 3, 4, 5, 6, 9, 10};
+    int vet[] = {5,5,5,5,5,5,5,5};
     
-    merge_sort(vet,0,(sizeof(vet)/sizeof(vet[0]))-1, NULL);
+    int *b = algoritmo_v1(vet, sizeof(vet)/sizeof(vet[0]));
 
     for (size_t i = 0; i < sizeof(vet)/sizeof(vet[0]); i++)
     {
-        printf("%i ",vet[i]);
-        
+        printf("%d ", b[i]);
     }
     printf("\n");
-
-    printf("%d\n",binary_search(vet,0,(sizeof(vet)/sizeof(vet[0]))-1,1));
+    
     
 }

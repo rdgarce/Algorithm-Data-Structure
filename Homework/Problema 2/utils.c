@@ -73,7 +73,6 @@ void merge_sort(int *A, int start, int end, int *num_op){
 */
 int binary_search(int *A, int start, int end, int elem){
 
-    // 1 2 3 4 5 5 5 6 9 10
     int center = (start + end)/2;
 
     if (end == start && A[start] != elem)
@@ -91,7 +90,35 @@ int binary_search(int *A, int start, int end, int elem){
         if (A[center + 1] == elem)
             return binary_search(A,center+1,end,elem);
         else
-            return center; 
+            return center + 1; 
     }
 
+}
+
+/*
+* Given an int vector [A] of size [size], returns a vector [B]
+* such that for each [A[i]], [B[i]] is equals to the number
+* of elements of [A] that are less or equal of [A[i]]
+*/
+int *algoritmo_v1(int *A, int size){
+
+    int *A_copy = malloc(sizeof(int)*size);
+    
+    // Copy of A into A_copy => O(n)
+    for (size_t i = 0; i < size; i++)
+        A_copy[i] = A[i];
+
+    // Merge sort of A_copy => O(nlog(n))
+    merge_sort(A_copy,0,size-1,NULL);
+
+    int *B = malloc(sizeof(int)*size);
+
+    // Iteration over A and binary-search of each A[i] into A_copy => O(nlog(n))
+    for (size_t i = 0; i < size; i++)
+        B[i] = binary_search(A_copy,0,size-1,A[i]);
+
+    return B;
+
+    // Total cost T(n) = O(n + 2nlog(n)) = O(nlog(n))
+        
 }

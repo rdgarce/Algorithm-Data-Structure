@@ -64,6 +64,7 @@ void append(LinkedList *list, llNode *node){
     my_node->next = node;   
 
 }
+
 /*
 * Mirror the sub-list of the [list] starting from the [n]-th element.
 * If [n] equals 0, the result will be the whole [list] being mirrored.
