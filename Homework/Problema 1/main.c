@@ -1,38 +1,43 @@
 #include "ll.c"
+#include "names.c"
+#include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
-#define SIZE 128
-#define LIST_SIZE 6
+// Number of tests to execute
+#define NUM_TESTS 3
 
 int main(void){
 
-    char temp;
-
-    LinkedList *list = createEmptyList();
-
-    for (size_t i = 0; i < LIST_SIZE; i++)
-    {
-        char buf[SIZE];
-        scanf("%[^\n]",buf);
-        scanf("%c",&temp);
-        append(list,createNode(buf));
-    }
+    srand(time(NULL));
     
-    printf("La lista e': ");
-    printList(list);
+    // Test generation
+    LinkedList *tests[NUM_TESTS];
+    int sizes[NUM_TESTS];
 
-    int result = mirrorList(list,LIST_SIZE/2 +1);
-    if (result != -1){
-        printf("La nuova lista e': ");
-        printList(list);
-        printf("E si sono scambiati di posizione %d elementi\n",result);
+    for (int i = 0; i < NUM_TESTS; i++){
+        
+        tests[i] = createEmptyList();
+        // Numero casuale pari
+        int size = ((rand() % 4) + 1)*2;
+        sizes[i] = size;
+
+        for (int k = 0; k < size; k++)
+            append(tests[i],createNode(get_name()));
         
     }
-    else
-    {
-        printf("Errore\n");
-    }
-    
+    // End test generation
 
+    // Execute algorithm and print list before and after
+    for (int i = 0; i < NUM_TESTS; i++){
+        
+        printf("Stampo la lista di input numero %d e sotto il relativo risultato dell'esecuzione:\n",i+1);
+        printList(tests[i]);
+        int exc = mirrorList(tests[i],sizes[i]/2);
+        printList(tests[i]);
+        printf("> Sono stati scambiati di posizione %d nome\\i\n",exc);
+        printf("----------");
+        printf("\n");
+    }
     
 }

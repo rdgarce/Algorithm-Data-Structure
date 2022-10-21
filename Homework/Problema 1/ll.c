@@ -77,26 +77,28 @@ int mirrorList(LinkedList *list, int n){
     int i = 0;
     int count = 0;
 
+    // Iter to the (n-1)-th element => O(n)
     while (node && i<n-1){
         node = node->next;
         i++;
     }
 
     if (node == NULL && i<n){
-        //Error: [n] > size of [list]
+        // Error: [n] > size of [list]
         return -1;
     }
         
     llNode *temp = node->next;
 
     if (temp == NULL){
-    //Info: Just one element to mirror
+        // Info: Just one element to mirror
         return 1;
     }
     
     llNode *temp1 = temp->next;
     llNode *temp2;
 
+    // Iter from the n-th element to the end of the list => O(n)
     while (temp1){
         temp2 = temp1->next;
         temp1->next = temp;
@@ -116,5 +118,6 @@ int mirrorList(LinkedList *list, int n){
     node->next = NULL;
     return count + 1;
     
+    // Total cost T(n) = O(n)
 
 }

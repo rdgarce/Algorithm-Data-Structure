@@ -3,16 +3,16 @@
 #include <stdio.h>
 #include <time.h>
 
-// Number of tests to execute defined here
+// Number of tests to execute
 #define NUM_TESTS 3
 
 int main(){
+    
+    srand(time(NULL));
 
-    // Test genetarion
+    // Test generation
     int *tests[NUM_TESTS];
     int sizes[NUM_TESTS];
-
-    srand(time(NULL));
 
     for (int i = 0; i < NUM_TESTS; i++){
         int size = (rand()%10) + 1;
