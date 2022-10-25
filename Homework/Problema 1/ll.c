@@ -20,7 +20,7 @@ LinkedList *createEmptyList(){
 
 llNode *createNode(char *elem){
         
-        llNode *node = malloc(sizeof(llNode) + sizeof(char) * strlen(elem));
+        llNode *node = malloc(sizeof(llNode) + sizeof(char) * (strlen(elem)+1));
         strcpy(node->elem,elem);
         node->next = NULL;
         return node;
