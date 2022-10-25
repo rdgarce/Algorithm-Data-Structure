@@ -18,9 +18,24 @@ LinkedList *createEmptyList(){
     return list;
 }
 
+void deleteLL(LinkedList *list){
+
+    llNode *head = list->head;
+    llNode *temp;
+    while (head){
+
+        temp = head;
+        head = head->next;
+        free(temp);
+    }
+
+    free(list);
+    
+}
+
 llNode *createNode(char *elem){
         
-        llNode *node = malloc(sizeof(llNode) + sizeof(char) * (strlen(elem)+1));
+        llNode *node = malloc(sizeof(llNode) + sizeof(char) * (strlen(elem) + 1));
         strcpy(node->elem,elem);
         node->next = NULL;
         return node;

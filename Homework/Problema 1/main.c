@@ -39,5 +39,10 @@ int main(void){
         printf("----------");
         printf("\n");
     }
+
+    // Free memory
+    for (int i = 0; i < NUM_TESTS; i++)
+        deleteLL(tests[i]);
+    
     
 }
