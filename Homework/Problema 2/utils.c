@@ -117,6 +117,7 @@ int *algoritmo_v1(int *A, int size){
     for (size_t i = 0; i < size; i++)
         B[i] = binary_search(A_copy,0,size-1,A[i]);
 
+    free(A_copy);
     return B;
 
     // Total cost T(n) = O(n + 2nlog(n)) = O(nlog(n))
