@@ -8,36 +8,34 @@ typedef struct tNode{
     struct tNode *p;
     struct tNode *l;
     struct tNode *r;
-    char elem[];
 }tNode;
 
 typedef struct Treap{
     tNode *root;
-    int n_elem;
+    int n_nodes;
 }Treap;
 
 
-tNode *createNode(int key, int priority, char *elem){
-    tNode *node = malloc(sizeof(tNode) + sizeof(char)*(strlen(elem) + 1));
+tNode *createNode(int key, int priority){
+    tNode *node = malloc(sizeof(tNode));
     node->key = key;
     node->priority = priority;
     node->l = NULL;
     node->p = NULL;
     node->r = NULL;
-    strcpy(node->elem,elem);
     return node;
 }
 
 Treap *createTreap(){
     Treap *t = malloc(sizeof(Treap));
     t->root = NULL;
-    t->n_elem = 0;
+    t->n_nodes = 0;
     return t;
 }
 
 void printTree(Treap *tree){
 
-    printf("%s ",tree->root->elem);
+    printf("%d ",tree->root->key);
     if (tree->root->l){
         Treap t = {.root = tree->root->l};
         printTree(&t);
@@ -50,25 +48,26 @@ void printTree(Treap *tree){
 
 }
 
-void deleteTreap(Treap *tree){
+void delete_sub_tree(tNode *node){
 
-    tNode *x = tree->root;
+    if (node->l)
+        delete_sub_tree(node->l);
 
-    if (x->l){
-        Treap t = {.root = x->l};
-        deleteTreap(&t);
+    if (node->r)
+        delete_sub_tree(node->r);
 
-    }
-    if (x->r){
-        Treap t = {.root = x->r};
-        deleteTreap(&t);
-    }
-
-    free(x);
-    free(tree);
-    tree = NULL;
+    free(node);
 
 }
+
+void deleteTreap(Treap *tree){
+
+    delete_sub_tree(tree->root);
+
+    free(tree);
+
+}
+
 void treap_fix(Treap *tree, tNode *node){
 
 }
@@ -96,7 +95,7 @@ void TreapInsert(Treap *tree, tNode *node){
         else
             y->l = node;
     
-    tree->n_elem++;
+    tree->n_nodes++;
     treap_fix(tree,node);
 }
 
