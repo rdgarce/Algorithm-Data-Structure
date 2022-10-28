@@ -15,9 +15,6 @@ int main(){
     TreapInsert(t,createNode(38,3));
 
     printTree(t);
-    
     deleteTreap(t);
-
-
     
 }

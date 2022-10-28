@@ -117,7 +117,6 @@ void delete_sub_tree(tNode *node){
 void deleteTreap(Treap *tree){
 
     delete_sub_tree(tree->root);
-
     free(tree);
 
 }
@@ -176,7 +175,6 @@ void treap_fix(Treap *tree, tNode *node){
             right_rotate(tree,node->p);
     }
     
-
 }
 
 void TreapInsert(Treap *tree, tNode *node){
@@ -204,5 +202,5 @@ void TreapInsert(Treap *tree, tNode *node){
     
     tree->n_nodes++;
     treap_fix(tree,node);
-}
 
+}
