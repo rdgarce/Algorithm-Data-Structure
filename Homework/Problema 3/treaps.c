@@ -173,7 +173,7 @@ void treap_fix(Treap *tree, tNode *node){
         if (node == node->p->r)
             left_rotate(tree,node->p);
         else
-            right_rotate(tree,node->r);
+            right_rotate(tree,node->p);
     }
     
 
