@@ -33,6 +33,13 @@ Treap *createTreap(){
     return t;
 }
 
+void printNode(tNode *node){
+
+    if (node)
+        printf("(%d,%d) ", node->key, node->priority);
+    
+}
+
 void printTree(Treap *tree){
 
     int depth = 1;
@@ -52,7 +59,8 @@ void printTree(Treap *tree){
 
         for (int i = 0; i < A_size; i++){
             if (A[i])
-                printf("%d ",A[i]->key);
+                //printf("%d ",A[i]->key);
+                printNode(A[i]);
             else
                 printf("- ");
             if (i%2 == 1 && i+1<A_size)
@@ -195,6 +203,6 @@ void TreapInsert(Treap *tree, tNode *node){
             y->l = node;
     
     tree->n_nodes++;
-    //treap_fix(tree,node);
+    treap_fix(tree,node);
 }
 
