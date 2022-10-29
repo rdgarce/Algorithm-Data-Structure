@@ -15,7 +15,6 @@ typedef struct Treap{
     int n_nodes;
 }Treap;
 
-
 tNode *createNode(int key, int priority){
     tNode *node = malloc(sizeof(tNode));
     node->key = key;
@@ -33,19 +32,28 @@ Treap *createTreap(){
     return t;
 }
 
-void printNode(tNode *node){
+void print_node(tNode *node){
 
     if (node)
         printf("(%d,%d) ", node->key, node->priority);
     
 }
 
+/*
+* Print the [tree] nodes in the following form:
+* (key,priority) or - if there is no node in that position.
+*/
 void printTree(Treap *tree){
+
+    if (tree->root == NULL){
+        printf("-\n");
+        return;
+    }
 
     int depth = 1;
     tNode *node = tree->root;
     tNode **A = malloc(sizeof(tNode)*depth);
-    tNode **B;
+    tNode **B = NULL;
     int A_size = 0;
     int B_size = 0;
     int B_index = 0;
@@ -59,8 +67,7 @@ void printTree(Treap *tree){
 
         for (int i = 0; i < A_size; i++){
             if (A[i])
-                //printf("%d ",A[i]->key);
-                printNode(A[i]);
+                print_node(A[i]);
             else
                 printf("- ");
             if (i%2 == 1 && i+1<A_size)
@@ -88,7 +95,7 @@ void printTree(Treap *tree){
 
         }
         printf("\n");
-
+        
         free(A);
         A = B;
         A_size = B_size;
@@ -98,7 +105,10 @@ void printTree(Treap *tree){
 
     }
     
-    free(B);
+    if (B)
+        free(B);
+
+    
 
 }
 
@@ -114,6 +124,9 @@ void delete_sub_tree(tNode *node){
 
 }
 
+/*
+* Deletes the [tree] and frees the memory
+*/
 void deleteTreap(Treap *tree){
 
     delete_sub_tree(tree->root);
@@ -121,9 +134,12 @@ void deleteTreap(Treap *tree){
 
 }
 
+/*
+* Applies a left rotation to the [node] of the [tree].
+*/
 void left_rotate(Treap *tree, tNode *node){
 
-    //assert node.p.r != NULL
+    //assert node.r != NULL
     tNode *right_son = node->r;
     right_son->p = node->p;
     
@@ -143,9 +159,12 @@ void left_rotate(Treap *tree, tNode *node){
 
 }
 
+/*
+* Applies a right rotation to the [node] of the [tree].
+*/
 void right_rotate(Treap *tree, tNode *node){
 
-    //assert node.p.l != NULL
+    //assert node.l != NULL
     tNode *left_son = node->l;
     left_son->p = node->p;
     
@@ -165,6 +184,10 @@ void right_rotate(Treap *tree, tNode *node){
 
 }
 
+/*
+* Restores the Treap properties of the [tree] all the way up
+* starting from the [node]
+*/
 void treap_fix(Treap *tree, tNode *node){
 
     while (node != tree->root && node->priority < node->p->priority){
@@ -177,11 +200,16 @@ void treap_fix(Treap *tree, tNode *node){
     
 }
 
+/*
+* Insert the [node] in the [tree] and then rearrange the nodes
+* in order to respect the Treap properties
+*/
 void TreapInsert(Treap *tree, tNode *node){
 
     tNode *x = tree->root;
     tNode *y = NULL;
 
+    // Iteration to a leaf of the tree => O(logn) since this is a Treap
     while (x){
         y = x;
         if (x->key <= node->key)
@@ -201,6 +229,10 @@ void TreapInsert(Treap *tree, tNode *node){
             y->l = node;
     
     tree->n_nodes++;
+
+    // Treap fix procedure => O(logn) in the worst case when the node goes up to the root
     treap_fix(tree,node);
+
+    // Total cost T(n) = O(2logn) = O(logn)
 
 }
