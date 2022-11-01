@@ -1,1 +1,0 @@
-gcc -g -o esercizio main.c

@@ -15,6 +15,10 @@ typedef struct Treap{
     int n_nodes;
 }Treap;
 
+/*
+* Node creation function.
+* The priority has to be chosen by the caller
+*/
 tNode *createNode(int key, int priority){
     tNode *node = malloc(sizeof(tNode));
     node->key = key;

@@ -114,7 +114,7 @@ int *algoritmo_v1(int *A, int size){
     int *B = malloc(sizeof(int)*size);
 
     // Iteration over A and binary-search of each A[i] into A_copy => O(nlog(n))
-    for (size_t i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
         B[i] = binary_search(A_copy,0,size-1,A[i]);
 
     free(A_copy);

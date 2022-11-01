@@ -1,0 +1,1 @@
+gcc -g -o eseguibile main.c
