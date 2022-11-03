@@ -23,6 +23,7 @@ int main(){
     for (size_t i = 0; i < num_tests; i++)
         printf("%d\n",where_is_the_ball(D[i],I[i]));
 
+    free(D);
 }
 
 int where_is_the_ball(int D, int I){
