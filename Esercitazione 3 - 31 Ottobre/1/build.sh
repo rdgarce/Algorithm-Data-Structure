@@ -1,1 +1,2 @@
-gcc -g -o eseguibile main.c
+gcc -c main.c
+gcc -o eseguibile main.o -lm
