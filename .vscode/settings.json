@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "cstddef": "c",
-        "string": "c"
+        "string": "c",
+        "random": "c"
     }
 }
