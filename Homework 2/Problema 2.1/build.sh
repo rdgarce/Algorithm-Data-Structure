@@ -1,1 +1,1 @@
-gcc -o esercizio main.c
+gcc -o esercizio main.c -g
