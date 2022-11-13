@@ -9,25 +9,31 @@ contrassegnate con 0 e le loro quattro celle adiacenti (sinistra, destra, sopra 
 Le mosse possibili da una determinata cella sono lo spostamento di una cella adiacente a 
 sinistra, destra, sopra o sotto (non sono consentiti spostamenti in diagonale). 
 
+Soluzione:
+Il problema viene risolto mediante la programmazione dinamica, sotto alcune ipotesi che permettono
+di visualizzarlo logicamente come quello di trovare il minimo percorso tra due nodi in un grafo aciclico.
+IPOTESI:
+1) Ogni cella della matrice che contiene '1', e soltanto '1', diventa un nodo in un grafo, a meno che essa non sia adiacente ad una cella contenente uno '0',
+2) Ogni nodo è connesso a tutti i nodi che corrispondono a celle adiacenti nella matrice di partenza,
+3) Viene mantenuta una matrice di booleani "visited" delle stesse dimensioni della matrice di partenza, dove, di volta in volta,
+    visited[i] = 'true' quando viene visitato il nodo i-esimo del grafo (corrispondente alla cella i-esima della matrice di partenza).
 
-MATRICE DI INPUT nxm:
-1 - 0 - 1 1 1
-1 1 - 1 1 1 1
-1 1 1 1 - 1 1
-1 1 1 - 0 - 1
+Le prime due ipotesi permettono di costruire un grafo (logico) corrispondente alla matrice,
+mentre grazie alla terza ipotesi vengono evitati in ogni circostanza percorsi che portano a nodi già visitati nella stessa istanza del problema,
+rendendo, di fatto, il grafo aciclico.
+Quest'ultima ipotesi non restringe il campo delle soluzioni del problema di partenza perché una soluzione contenente un ciclo è sicuramente minorata
+dalla stessa soluzione al netto del ciclo.
 
-MATRICE DI INPUT 2:
-1 - 0 - 1
-1 1 - 1 1
-1 1 1 1 1
+Formula della ricorsione:
+D(s,v) = min_u{1 + D(u,v) | per ogni u collegato ad s che non sia già stato visitato}
 
-MATRICE DI INPUT 3:
-1 1 1
-1 1 1
-1 1 1
+    Casi base:
+        D(s,s) = 0
+        D(s,v) = INT_MAX (Inteso come infinito), se da s non esiste un percorso per v che obblighi a passare per una cella già visitata in precedenza
 
-MATRICE DI MEMOIZATION nxn:
+MATRICE DI MEMOIZATION (nxm)x(nxm):
 Salvo il costo del minimo percorso da ogni cella verso ogni cella della matrice:
+
          0     1     2    ...  nxm-1
       |-----------------------------|
 0     |  0  | ... |     |     | ... |
@@ -37,11 +43,33 @@ Salvo il costo del minimo percorso da ogni cella verso ogni cella della matrice:
 nxm-1 |     |     |     | ... |  0  |
       |-----------------------------|
 
-Formula della ricorsione
-D(s,v) = min_u{1 + D(u,v) | per ogni u collegato ad s che non sia a sinistra di s}
+Test:
 
-Caso base:
-D(s,s) = 0
+MATRICE DI INPUT 1 nxm:
+1 - 0 - 1 1 1
+1 1 - 1 1 1 1
+1 1 1 1 - 1 1
+1 1 1 - 0 - 1
+
+MATRICE DI INPUT 2 nxm:
+1 - 0 - 1
+1 1 - 1 1
+1 1 1 1 1
+
+MATRICE DI INPUT 3 nxm:
+1 1 1
+1 1 1
+1 1 1
+
+MATRICE DI INPUT 4 nxm:
+1 1 - 1 1 1 1 1 1 1 1 1 1
+1 - 0 - 1 1 1 1 - 1 1 1 1
+1 1 - 1 1 1 1 - 0 - 1 1 1
+1 1 - 1 1 - 1 1 - - 1 1 1
+1 - 0 - - 0 - 1 - 0 - 1 1
+1 1 - 1 1 - 1 1 1 - 1 1 1
+1 1 1 1 1 1 1 1 - 0 - 1 1
+
 */
 
 #include <stdbool.h>
@@ -56,12 +84,20 @@ D(s,s) = 0
 void indegree(bool *matrix, int m_rows, int m_cols, int *array_of_position, int *array_size, int position);
 void print_array(int *A, int len);
 int min_paths(bool *matrix, int m_rows, int m_cols);
-int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int prev_pos, int end_pos, int *memo);
+int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int end_pos, bool *visited, int *memo);
 
 int main(){
 
-    bool m[4][7] = {{1,1,0,1,1,1,1},{1,1,1,1,1,1,1},{1,1,1,1,1,1,1},{1,1,1,1,0,1,1}};
-    int best_value_path = min_paths(m,4,7);
+    bool m[7][13] = {
+                        {1,1,1,1,1,1,1,1,1,1,1,1,1},
+                        {1,1,0,1,1,1,1,1,1,1,1,1,1},
+                        {1,1,1,1,1,1,1,1,0,1,1,1,1},
+                        {1,1,1,1,1,1,1,1,1,1,1,1,1},
+                        {1,1,0,1,1,0,1,1,1,0,1,1,1},
+                        {1,1,1,1,1,1,1,1,1,1,1,1,1},
+                        {1,1,1,1,1,1,1,1,1,1,0,1,1}
+                    };
+    int best_value_path = min_paths(m,7,13);
 
     printf("Il percorso minimo ha lunghezza: %d\n",best_value_path);
 }
@@ -69,7 +105,8 @@ int main(){
 int min_paths(bool *matrix, int m_rows, int m_cols){
 
     int *memo = malloc(sizeof(int)*m_rows*m_cols*m_rows*m_cols);
-    if (!memo)
+    bool *visited = malloc(sizeof(bool)*m_rows*m_cols);
+    if (!memo || !visited)
         exit(-1);
     
     memset(memo,-1,sizeof(int)*m_rows*m_cols*m_rows*m_cols);
@@ -80,7 +117,8 @@ int min_paths(bool *matrix, int m_rows, int m_cols){
 
         for (int j = m_cols - 1; j < m_rows*m_cols; j = j + m_cols){
             
-            temp = min_path(matrix,m_rows,m_cols,i,i,j,memo);
+            //memset(visited,false,sizeof(bool)*m_rows*m_cols);
+            temp = min_path(matrix,m_rows,m_cols,i,j,visited,memo);
             if (temp < best_path_value)
                 best_path_value = temp;
 
@@ -100,13 +138,16 @@ int min_paths(bool *matrix, int m_rows, int m_cols){
         
     }
     */
-
+    
     free(memo);
+    free(visited);
     return best_path_value != INT_MAX ? best_path_value : -1;
     
 }
 
-int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int prev_pos, int end_pos, int *memo){
+int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int end_pos, bool *visited, int *memo){
+
+    visited[start_pos] = true;
 
     //printf("Parto da: %d\n",  start_pos);
 
@@ -118,10 +159,12 @@ int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int prev_pos, 
     }
 
     // Controllo se esiste già un risultato memorizzato
-    if (memo[memo_index(start_pos,end_pos,m_rows, m_cols)] >= 0)
+    if (memo[memo_index(start_pos,end_pos,m_rows, m_cols)] >= 0){
+        //printf("*** STO FACENDO RIUSO ***\n");
         return memo[memo_index(start_pos,end_pos,m_rows, m_cols)];
+    }
     
-    int *neighbors = malloc(sizeof(int)*3);
+    int *neighbors = malloc(sizeof(int)*4);
     if (!neighbors)
         exit(-1);
     
@@ -142,10 +185,11 @@ int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int prev_pos, 
     int temp;
     for (int i = 0; i < size; i++){
 
-        if (neighbors[i] != prev_pos){
-
-            temp = min_path(matrix, m_rows, m_cols, neighbors[i], start_pos, end_pos, memo);
+        if (!visited[neighbors[i]]){
             
+            temp = min_path(matrix, m_rows, m_cols, neighbors[i], end_pos, visited, memo);
+            visited[neighbors[i]] = false;
+
             if (temp != INT_MAX)
                 memo[memo_index(neighbors[i],end_pos,m_rows, m_cols)] = temp;
             
@@ -174,30 +218,6 @@ void indegree(bool *matrix, int m_rows, int m_cols, int *array_of_position, int 
     int temp;
     bool condition = false;
 
-    // Verifico se il nodo in ALTO è collegato al nodo [position]
-    neighbor = position - m_cols;
-    if (legal_pos(neighbor,m_rows,m_cols) && matrix[neighbor] == 1){
-        condition = true;
-
-        // Verifico se tale nodo ha un nodo in ALTO che è 0
-        temp = neighbor - m_cols;
-        if (legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
-            condition = false;
-        // Verifico se tale nodo ha un nodo in SINISTRA che è 0
-        temp = neighbor - 1;
-        if ((neighbor % m_cols != 0) && legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
-            condition = false;
-        // Verifico se tale nodo ha un nodo in DESTRA che è 0
-        temp = neighbor + 1;
-        if ((temp % m_cols != 0) && legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
-            condition = false;
-    }
-    if (condition == true){
-        array_of_position[count] = neighbor;
-        count++;
-        condition = false;
-    }
-
     // Verifico se il nodo in DESTRA è collegato al nodo [position]
     neighbor = position + 1;
     if ((neighbor % m_cols != 0) && legal_pos(neighbor,m_rows,m_cols) && matrix[neighbor] == 1){
@@ -210,6 +230,30 @@ void indegree(bool *matrix, int m_rows, int m_cols, int *array_of_position, int 
         // Verifico se tale nodo ha un nodo in BASSO che è 0
         temp = neighbor + m_cols;
         if (legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
+            condition = false;
+        // Verifico se tale nodo ha un nodo in DESTRA che è 0
+        temp = neighbor + 1;
+        if ((temp % m_cols != 0) && legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
+            condition = false;
+    }
+    if (condition == true){
+        array_of_position[count] = neighbor;
+        count++;
+        condition = false;
+    }
+
+    // Verifico se il nodo in ALTO è collegato al nodo [position]
+    neighbor = position - m_cols;
+    if (legal_pos(neighbor,m_rows,m_cols) && matrix[neighbor] == 1){
+        condition = true;
+
+        // Verifico se tale nodo ha un nodo in ALTO che è 0
+        temp = neighbor - m_cols;
+        if (legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
+            condition = false;
+        // Verifico se tale nodo ha un nodo in SINISTRA che è 0
+        temp = neighbor - 1;
+        if ((neighbor % m_cols != 0) && legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
             condition = false;
         // Verifico se tale nodo ha un nodo in DESTRA che è 0
         temp = neighbor + 1;
@@ -238,6 +282,30 @@ void indegree(bool *matrix, int m_rows, int m_cols, int *array_of_position, int 
         // Verifico se tale nodo ha un nodo in DESTRA che è 0
         temp = neighbor + 1;
         if ((temp % m_cols != 0) && legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
+            condition = false;
+    }
+    if (condition == true){
+        array_of_position[count] = neighbor;
+        count++;
+        condition = false;
+    }
+
+    // Verifico se il nodo in SINISTRA è collegato al nodo [position]
+    neighbor = position - 1;
+    if ((position % m_cols != 0) && legal_pos(neighbor,m_rows,m_cols) && matrix[neighbor] == 1){
+        condition = true;
+
+        // Verifico se tale nodo ha un nodo in BASSO che è 0
+        temp = neighbor + m_cols;
+        if (legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
+            condition = false;
+        // Verifico se tale nodo ha un nodo in SINISTRA che è 0
+        temp = neighbor - 1;
+        if ((neighbor % m_cols != 0) && legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
+            condition = false;
+        // Verifico se tale nodo ha un nodo in ALTO che è 0
+        temp = neighbor - m_cols;
+        if (legal_pos(temp,m_rows,m_cols) && matrix[temp] == 0)
             condition = false;
     }
     if (condition == true){
