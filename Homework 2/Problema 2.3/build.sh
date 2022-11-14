@@ -1,1 +1,1 @@
-gcc -o esercizio main.c -g
+gcc -o esercizio main.c -g -Wall -Wextra
