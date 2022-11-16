@@ -9,42 +9,47 @@ int main(){
     printTree(t);
     printf("\n**********\n");
 
-    TreapInsert(t,createNode(9,5));
+    TreapInsert(t,createNode(500,2000));
     printf("\n*** Stampa dell'albero ***\n\n");
     printTree(t);
     printf("\n**********\n");
 
-    TreapInsert(t,createNode(18,2));
+    TreapInsert(t,createNode(1000,4000));
     printf("\n*** Stampa dell'albero ***\n\n");
     printTree(t);
     printf("\n**********\n");
 
-    TreapInsert(t,createNode(2,9));
+    TreapInsert(t,createNode(1100,3000));
     printf("\n*** Stampa dell'albero ***\n\n");
     printTree(t);
     printf("\n**********\n");
 
-    TreapInsert(t,createNode(7,1));
+    TreapInsert(t,createNode(2000,1900));
     printf("\n*** Stampa dell'albero ***\n\n");
     printTree(t);
     printf("\n**********\n");
 
-    TreapInsert(t,createNode(3,10));
+    TreapInsert(t,createNode(6000,2100));
     printf("\n*** Stampa dell'albero ***\n\n");
     printTree(t);
     printf("\n**********\n");
 
-    TreapInsert(t,createNode(0,3));
+    TreapInsert(t,createNode(6000,2000));
     printf("\n*** Stampa dell'albero ***\n\n");
     printTree(t);
     printf("\n**********\n");
 
-    TreapInsert(t,createNode(23,3));
+    TreapInsert(t,createNode(6000,1200));
     printf("\n*** Stampa dell'albero ***\n\n");
     printTree(t);
     printf("\n**********\n");
 
-    TreapInsert(t,createNode(38,3));
+    TreapInsert(t,createNode(6008,1300));
+    printf("\n*** Stampa dell'albero ***\n\n");
+    printTree(t);
+    printf("\n**********\n");
+
+    TreapInsert(t,createNode(8000,1400));
     printf("\n*** Stampa dell'albero ***\n\n");
     printTree(t);
     printf("\n**********\n");

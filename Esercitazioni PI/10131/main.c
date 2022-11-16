@@ -23,48 +23,46 @@ elephant_t ELEPHANT_MAX = {
 void merge_sort_by_size(elephant_t *A, int start, int end, int *num_op);
 void merge(elephant_t *A, int start, int center,int end, int *num_op);
 void max_substring_of_elephants(elephant_t *A, int A_size, int *R, int *R_size);
+void max_substring_of_elephants_v2(elephant_t *A, int A_size, int *R, int *R_size);
 
 void print_elephant(elephant_t elephant);
 void print_array(elephant_t *A, int len);
 
+#define MAX_LENGTH 1000
+
 int main(){
 
-    elephant_t a[3];
-    
-    elephant_t e1 = {
-        .index = 0,
-        .size = 1000,
-        .iq = 100
-    };
+    char buffer[12];
 
-    elephant_t e2 = {
-        .index = 1,
-        .size = 100,
-        .iq = 500
-    };
-
-    elephant_t e3 = {
-        .index = 2,
-        .size = 500,
-        .iq = 1500
-    };
-
-    a[0] = e1;
-    a[1] = e2;
-    a[2] = e3;
-
-    print_array(a,3);
-    merge_sort_by_size(a,0,2,NULL);
-    print_array(a,3);
-    
-    int R[3];
+    elephant_t array[MAX_LENGTH];
+    int R[MAX_LENGTH];
     int size;
-    max_substring_of_elephants(a,3,R,&size);
+
+
+    int index = 0;
+    while ((fgets(buffer,sizeof(buffer),stdin) != NULL))
+    {   
+        if (sscanf(buffer,"%d %d",&array[index].size,&array[index].iq) != 2)
+            break;
+        array[index].index = index+1;
+        index++;
+    }
+
+    print_array(array,index);
+    merge_sort_by_size(array,0,index-1,NULL);
+    printf("\n");
+    print_array(array,index);
+
+
+    max_substring_of_elephants_v2(array,index,R,&size);
 
     for (int i = 0; i < size; i++)
     {
         printf("%d ",R[i]);
     }
+    
+    
+
 }
 
 void merge(elephant_t *A, int start, int center,int end, int *num_op){
@@ -156,11 +154,14 @@ void max_substring_of_elephants(elephant_t *A, int A_size, int *R, int *R_size){
     {
         if (A[i].iq < A[current_index].iq)
         {
+            printf("Sono su con i=%d e current_index=%d\n",i,current_index);
             current_index = i;
+            continue;
         }
         
         if(A[i].iq >= A[current_index].iq || i == A_size-1)
-        {
+        {   
+            printf("Sono giu con i=%d e current_index=%d\n",i,current_index);
             size = current_index - start_index+1;
             if (size > best_size)
             {
@@ -173,11 +174,47 @@ void max_substring_of_elephants(elephant_t *A, int A_size, int *R, int *R_size){
         }  
     }
 
+    printf("(%d,%d)\n",best_start_index,best_current_index);
+
     for (int i = best_start_index; i <= best_current_index; i++)
     {
         R[i-best_start_index] = A[i].index;
     }
 
     *R_size = best_size;
+
+}
+
+/*
+* V2: Supposto A ordinato in base alla size, torna la sottolista che rispetta il vincolo sull'IQ
+*/
+void max_substring_of_elephants_v2(elephant_t *A, int A_size, int *R, int *R_size){
+
+    int r_current = 0;
+    int a_current = 0;
+    for (int i = 1; i < A_size; i++)
+    {
+        if (A[a_current].iq > A[i].iq && i != A_size - 1)
+        {
+            R[r_current] = A[a_current].index;
+            r_current++;
+            a_current = i;
+            
+        }
+        else if (A[a_current].iq > A[i].iq && i == A_size - 1)
+        {
+            R[r_current] = A[a_current].index;
+            r_current++;
+            R[r_current] = A[i].index;
+            r_current++;
+        }
+        else
+        {
+            a_current++;
+        }
+
+    }
+
+    *R_size = r_current;
 
 }
