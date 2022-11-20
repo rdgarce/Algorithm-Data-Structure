@@ -13,8 +13,8 @@ Si  consideri  una  matrice  di  0  ed  1,  in  cui  “1”  indica  “posizio
 1 0 0 0
 1 0 0 0
 1 1 1 1
-
 */
+
 typedef enum Dim_t{
     BASE,
     ROW,
