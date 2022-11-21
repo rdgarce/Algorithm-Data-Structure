@@ -92,3 +92,32 @@ void printArray(int *A, int len){
     printf("]\n");
     
 }
+
+/*
+* Return the index of highest index copy of [elem] in the ordered [A] vector
+* starting from the [start] index to the [end] index,
+* or -1 if [elem] is not present in [A]
+*/
+int binary_search(int *A, int start, int end, int elem){
+
+    int center = (start + end)/2;
+
+    if (end == start && A[start] != elem)
+        return -1;
+    
+
+    if (A[center] < elem)
+        return binary_search(A,center+1,end,elem);
+    
+    else if(A[center] > elem)
+        return binary_search(A,start,center-1,elem);
+    
+    else{
+
+        if (A[center + 1] == elem)
+            return binary_search(A,center+1,end,elem);
+        else
+            return center + 1; 
+    }
+
+}
