@@ -50,6 +50,7 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
         // Setting della matrice TOP
         if (LEGAL_POS(m_rows,m_cols,i-m_cols))
         {
+            printf("Aggiorno TOP[%d]=%d con TOP[%d]+1=%d\n",i,TOP[i],i-m_cols,TOP[i-m_cols] + 1);
             TOP[i] = TOP[i-m_cols] + 1;
         }
         else
@@ -58,8 +59,9 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
         }
 
         // Settig della matrice LEFT
-        if (SAME_ROW(m_rows,m_cols,i,i-1))
+        if (LEGAL_POS(m_rows,m_cols,i-1) && SAME_ROW(m_rows,m_cols,i,i-1))
         {
+            printf("Aggiorno LEFT[%d]=%d con LEFT[%d]+1=%d\n",i,LEFT[i],i-1,LEFT[i-1] + 1);
             LEFT[i] = LEFT[i-1] + 1;
         }
         else
