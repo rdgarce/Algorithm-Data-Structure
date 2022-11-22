@@ -32,7 +32,7 @@ D(s,v) = min_u{1 + D(u,v) | per ogni u collegato ad s che non sia già stato vis
         D(s,v) = INT_MAX (Inteso come infinito), se da s non esiste un percorso per v che obblighi a passare per una cella già visitata in precedenza
 
 MATRICE DI MEMOIZATION (nxm)x(nxm):
-Salvo il costo del minimo percorso da ogni cella verso ogni cella della matrice:
+Viene salvato il costo del minimo percorso da ogni cella verso ogni cella della matrice:
 
          0     1     2    ...  nxm-1
       |-----------------------------|
