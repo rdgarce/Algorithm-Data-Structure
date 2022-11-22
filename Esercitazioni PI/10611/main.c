@@ -39,17 +39,8 @@ int main()
             printf("%d %d\n",chimps[index1], chimps[index2]);
         }
         else{
-            index2 = index1;
-            bool trovato = false;
-            while (index2<n_chimps && !trovato)
-            {
-                index2++;
-                if (chimps[index2] > queries[i])
-                {
-                    trovato = true;
-                }
-            }
-            if (trovato)
+            index2 = index1 + 1;
+            if (index2 < n_chimps)
             {
                 printf("%d %d\n",chimps[index1], chimps[index2]);
             }
