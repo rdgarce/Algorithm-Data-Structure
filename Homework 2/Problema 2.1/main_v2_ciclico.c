@@ -79,12 +79,12 @@ MATRICE DI INPUT 4 nxm:
 #include <string.h>
 
 #define LEGAL_POS(index,rows,cols) ((index) >= 0 && (index) < (rows)*(cols))
-#define MEMO_INDEX(start_pos, end_pos, k, rows, cols) ((start_pos)*(cols)*(rows) + (end_pos) + (k)*(cols)*(rows))
+#define MEMO_INDEX(start_pos, end_pos, k, rows, cols) ((start_pos)*(cols)*(rows) + (end_pos) + (k)*(rows)*(cols)*(rows)*(cols))
 
 void indegree(bool *matrix, int m_rows, int m_cols, int *array_of_position, int *array_size, int position);
 void print_array(int *A, int len);
 int min_paths(bool *matrix, int m_rows, int m_cols);
-int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int end_pos, int k, int *memo);
+int min_path(bool *matrix, int m_rows, int m_cols, int prev_pos, int start_pos, int end_pos, int k, int *memo);
 
 int main(){
 
@@ -144,7 +144,7 @@ int min_paths(bool *matrix, int m_rows, int m_cols)
         // Ciclo su tutti gli elementi dell'ultima colonna
         for (int j = m_cols - 1; j < m_rows*m_cols; j = j + m_cols)
         {
-            temp = min_path(matrix,m_rows,m_cols,i,j, m_rows*m_cols, memo);
+            temp = min_path(matrix,m_rows,m_cols,i,i,j, m_rows*m_cols -1, memo);
             if (temp < best_path_value)
                 best_path_value = temp;
         }
@@ -154,7 +154,7 @@ int min_paths(bool *matrix, int m_rows, int m_cols)
     return best_path_value != INT_MAX ? best_path_value : -1;
 }
 
-int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int end_pos, int k, int *memo)
+int min_path(bool *matrix, int m_rows, int m_cols,int prev_pos, int start_pos, int end_pos, int k, int *memo)
 {
 
     printf("Parto da: %d\n",  start_pos);
@@ -171,8 +171,8 @@ int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int end_pos, i
     if (k == 0 && start_pos != end_pos)
     {
         printf("Sto scrivendo INF nella pos %d, come costo del percorso %d-esimo (%d,%d)\n",MEMO_INDEX(start_pos, end_pos, k, m_rows, m_cols),k,start_pos,end_pos);
-        memo[MEMO_INDEX(start_pos, end_pos, k, m_rows, m_cols)] = INT_MAX/10;
-        return INT_MAX/10;
+        memo[MEMO_INDEX(start_pos, end_pos, k, m_rows, m_cols)] = INT_MAX;
+        return INT_MAX;
     }
     
 
@@ -192,14 +192,16 @@ int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int end_pos, i
     // Calcolo le celle raggiungibili da quella attuale
     indegree(matrix,m_rows,m_cols,neighbors,&size,start_pos);
 
-    int result = INT_MAX/10;
+    int result = INT_MAX;
     int temp;
     // Iterazione su tutte le celle raggiungibili
     for (int i = 0; i < size; i++)
     {
+        if (neighbors[i] == prev_pos)
+            continue;
         
         // Calcolo della soluzione ottima del sottoproblema per il nodo prossimo
-        temp = min_path(matrix, m_rows, m_cols, neighbors[i], end_pos, k-1, memo);
+        temp = min_path(matrix, m_rows, m_cols,start_pos, neighbors[i], end_pos, k-1, memo);
         
         // Salvataggio della soluzione del sottoproblema se questa è migliore della precedente
         if (temp < result)
@@ -207,12 +209,8 @@ int min_path(bool *matrix, int m_rows, int m_cols, int start_pos, int end_pos, i
     }
     
     // Salvataggio della soluzione del problema attuale se è stata trovata una soluzione con costo minore di infinito
-    if (result != INT_MAX)
-    {
-        printf("Sto salvando %d per il percorso %d-esimo (%d,%d) in pos %d\n",result,k,start_pos,end_pos,MEMO_INDEX(start_pos, end_pos, k, m_rows, m_cols));
-        memo[MEMO_INDEX(start_pos, end_pos, k, m_rows, m_cols)] = result;
-    }
-        
+    printf("Sto salvando %d per il percorso %d-esimo (%d,%d) in pos %d\n",result,k,start_pos,end_pos,MEMO_INDEX(start_pos, end_pos, k, m_rows, m_cols));
+    memo[MEMO_INDEX(start_pos, end_pos, k, m_rows, m_cols)] = result;        
 
     free(neighbors);
     
