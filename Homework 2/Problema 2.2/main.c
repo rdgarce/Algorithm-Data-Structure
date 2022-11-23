@@ -3,57 +3,38 @@
 #include <stdio.h>
 
 int number_of_couples(int n);
-int number_of_couples_dp_solver(int n, int *memo);
-int number_of_couples_v2(int n);
+
+#define MAX_SAFE_VALUE 19
 
 int main(){
 
-    printf("%d\n",number_of_couples(6));
-    printf("%d\n",number_of_couples_v2(6));
+    int n_tests;
+    int num;
 
+    printf("Inserire il numero di casi di test\n");
+    scanf("%d",&n_tests);
+    for (int i = 0; i < n_tests; i++)
+    {
+        printf("Inserire la cardinalita' dell'insieme del #%d caso di test\n",i+1);
+        scanf("%d",&num);
+
+        if (num <= MAX_SAFE_VALUE)
+        {
+            printf("Il risultato del #%d caso di test e': %d\n",i+1,number_of_couples(num));
+        }
+        else
+        {
+            printf("Il risultato del #%d caso di test non e' calcolabile poiche' la cardinalita' inserita è troppo grande\n",i+1);
+        }
+    }
 }
 
 /*
-* Given a group of [n] elements, with [n] >= 0,
-* returns the total number of ways in which 
-* the [n] elements can remain single or can be paired,
-* or -1 if an error occurred
+* Dato un gruppo di [n] elementi, con [n] >= 0,
+* restituisce il numero totale di modi in cui 
+* gli [n] elementi possono rimanere singoli o essere accoppiati
 */
 int number_of_couples(int n)
-{
-
-    int *memo = malloc(sizeof(int)*n);
-    if (!memo)
-        return -1;
-
-    memset(memo,0,sizeof(int)*n);
-    
-    return number_of_couples_dp_solver(n, memo);
-
-}
-
-int number_of_couples_dp_solver(int n, int *memo)
-{
-
-    if (n <= 2)
-        return n;
-    
-    if (memo[n-1] > 0)
-        return memo[n-1];
-    
-    int result = number_of_couples_dp_solver(n-1,memo) + (n-1)*number_of_couples_dp_solver(n-2,memo);
-    memo[n-1] = result;
-    return result;
-
-}
-
-/*
-* Given a group of [n] elements, with [n] >= 0,
-* returns the total number of ways in which 
-* the [n] elements can remain single or can be paired,
-* or -1 if an error occurred
-*/
-int number_of_couples_v2(int n)
 {
     if (n <= 2)
         return n;
@@ -67,6 +48,6 @@ int number_of_couples_v2(int n)
         memo[0] = memo[1];
         memo[1] = result;
     }
+
     return result;
-    
 }
