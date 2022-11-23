@@ -1,3 +1,25 @@
+/*
+
+Soluzione:
+La formula della ricorrenza può essere inferita guardando all'evoluzione dell'output tra (n-1) ed (n).
+L'aggiunta dello (n)-esimo elemento produce:
+1) Gli stessi sottoinsiemi che si avevano per (n-1) con l'aggiunta dello (n)-esimo elemento non accoppiato con nessuno
+   dei precedenti.
+2) Altri sottoinsiemi derivanti dagli (n-1) modi di accoppiare il nuovo elemento con i precedenti moltiplicato per il numero
+   di sottinsiemi generati dalle combinazioni dei rimanenti (n-2) elementi.
+
+Formalmente, la ricorrenza si esprime come:
+R(n) = R(n-1) + (n-1)*R(n-2)
+
+Casi base:
+R(1) = 1
+R(2) = 2
+
+Il problema viene risolto con la DP utilizzando un approccio iterativo che consente di avere una complessità spaziale costante.
+NOTA BENE: Data la rappresentazione in interi su 4 byte, input maggiori di MAX_SAFE_VALUE generano valori errati a causa overflow.
+
+*/
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

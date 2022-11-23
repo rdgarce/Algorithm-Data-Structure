@@ -1,19 +1,7 @@
-/*
-Si  consideri  una  matrice  di  0  ed  1,  in  cui  “1”  indica  “posizione  occupata”  e  “0”  indica 
-“posizione libera”. Si scriva un algoritmo per determinare la sottomatrice massima libera 
-(ossia che contiene tutti 0). L’algoritmo deve riportare il numero di 0 di tale sottomatrice. 
-*/
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-/*
-1 1 1 1
-1 0 0 0
-1 0 0 0
-1 1 1 1
-*/
 
 typedef enum Dim_t{
     BASE,
@@ -24,21 +12,76 @@ typedef enum Dim_t{
 int max_submatrix(bool *matrix, int m_rows, int m_cols);
 int max_submatrix_v2_(bool *matrix, int m_rows, int m_cols, int position, int sub_m_h, int sub_m_w, Dim_t dim, int *visited);
 
+int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols);
 
+#define LEGAL_POS(m_rows, m_cols, position) ((position) >= 0 && (position) < (m_rows)*(m_cols))
+#define SAME_ROW(m_rows, m_cols, position1, position2) ((position1)/(m_cols) == (position2)/(m_cols))
+#define MAX(one, two) ((one) > (two) ? (one) : (two))
+#define MIN(one, two) ((one) < (two) ? (one) : (two))
 
+#define MAX_TESTS 10000
+#define MAX_ROWS 5
+#define MAX_COLS 5
+#define ONES_QNT 1/2
 int main(){
-    
-    bool m[5][5]={
-                    {0,1,1,1,1},
-                    {1,0,1,0,1},
-                    {1,1,0,0,1},
-                    {1,0,0,0,1},
-                    {1,1,1,1,0}
-                };
 
-    int a = max_submatrix(m,5,5);
-    printf("Size = %d\n",a);
-    
+    int n_tests = MAX_TESTS;
+    int m_rows, m_cols;
+    bool *matrix;
+    int rand_pos;
+    int res1, res2;
+    for (int i = 0; i < n_tests; i++)
+    {
+        m_rows = rand() % MAX_ROWS + 1;
+        m_cols = rand() % MAX_COLS + 1;
+
+        matrix = calloc(m_rows*m_cols,sizeof(bool));
+        if (!matrix)
+        {
+            printf("Errore di inizializzazione\n");
+            exit(-1);
+        }
+
+        for (int i = 0; i < m_rows*m_cols*ONES_QNT; i++)
+        {
+            rand_pos = rand() % (m_rows*m_cols);
+            if (matrix[rand_pos] != 1)
+            {
+                matrix[rand_pos] = 1;
+            }
+            else
+            {
+                while (matrix[rand_pos] == 1)
+                {
+                    rand_pos = rand() % (m_rows*m_cols);
+                }
+                matrix[rand_pos] = 1;
+            }
+            
+        }
+
+        res1 = max_submatrix(matrix,m_rows,m_cols);
+        res2 = max_sub_matrix_size(matrix,m_rows,m_cols);
+
+        if (res1 != res2)
+        {
+            printf("Errore trovato!\n>Res1 = %d e Res2 = %d\n",res1,res2);
+            for (int i = 0; i < m_rows; i++)
+            {
+                for (int j = 0; j < m_cols; j++)
+                {
+                    printf("%d ",matrix[i*m_cols + j]);
+                }
+                printf("\n");
+                
+            }
+            printf("\n");
+
+        }
+        free(matrix);
+
+    }
+    printf("Test terminati\n");
     
 }
 
@@ -190,4 +233,71 @@ int max_submatrix_v2_(bool *matrix, int m_rows, int m_cols, int position, int su
         }    
         return sub_m_h*sub_m_w;
     }
+}
+
+int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
+{
+    
+    int *TOP = malloc(sizeof(int)*m_rows*m_cols);
+    int *LEFT = malloc(sizeof(int)*m_rows*m_cols);
+    if (!TOP || !LEFT)
+    {
+        return -1;
+    }
+    
+    memset(TOP,0,sizeof(int)*m_rows*m_cols);
+    memset(LEFT,0,sizeof(int)*m_rows*m_cols);
+
+    int max_area = 0;
+    int temp = 0;
+    int sub_area = 0;
+
+    for (int i = 0; i < m_rows*m_cols; i++)
+    {
+        if (matrix[i] != 0)
+            continue;
+        
+        // Setting della matrice TOP
+        if (LEGAL_POS(m_rows,m_cols,i-m_cols))
+        {
+            TOP[i] = TOP[i-m_cols] + 1;
+        }
+        else
+        {
+            TOP[i] = 1;
+        }
+
+        // Setting della matrice LEFT
+        if (LEGAL_POS(m_rows,m_cols,i-1) && SAME_ROW(m_rows,m_cols,i,i-1))
+        {
+            LEFT[i] = LEFT[i-1] + 1;
+        }
+        else
+        {
+            LEFT[i] = 1;
+        }
+
+        // Trovo l'area massima
+        if (LEGAL_POS(m_rows,m_cols,i-m_cols-1))
+        {
+            sub_area = MIN(TOP[i],TOP[i-m_cols-1]+1) * MIN(LEFT[i],LEFT[i-m_cols-1]+1);
+        }
+        else
+        {
+            sub_area = TOP[i] * LEFT[i];
+        }
+
+        temp = MAX(sub_area,MAX(TOP[i],LEFT[i]));
+        
+        if (temp > max_area)
+        {
+            max_area = temp;
+        }
+        
+    }
+
+    free(TOP);
+    free(LEFT);
+    return max_area;
+
 }

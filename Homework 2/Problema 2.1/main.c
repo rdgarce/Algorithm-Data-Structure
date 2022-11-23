@@ -1,4 +1,5 @@
 /*
+
 Soluzione:
 Il problema viene risolto mediante la programmazione dinamica, sotto alcune ipotesi che permettono
 di visualizzarlo logicamente come quello di trovare il minimo percorso tra nodi in un grafo ciclico.
@@ -120,7 +121,7 @@ int main(){
         }
 
         printf("Il percorso minimo della matrice del #%d caso di test ha lunghezza: %d\n",i+1,min_paths(matrix,m_rows,m_cols));
-
+        free(matrix);
     }
     
 }

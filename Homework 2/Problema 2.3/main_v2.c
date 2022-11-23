@@ -13,15 +13,15 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols);
 int main()
 {
 
-    bool m[5][6]={
-                    {0,0,1,1,1,0},
-                    {0,1,0,0,0,0},
-                    {1,1,0,0,0,0},
-                    {0,0,0,1,1,0},
-                    {0,0,0,1,1,0},
+    bool m[5][4]={
+                    {1, 1, 0, 1},
+                    {1, 1, 1, 1},
+                    {0, 1, 0, 0},
+                    {1, 0, 0, 0},
+                    {1, 0, 0, 0}
                 };
     
-    int res = max_sub_matrix_size(m,5,6);
+    int res = max_sub_matrix_size(m,5,4);
     printf("RES: %d\n",res);
 }
 
