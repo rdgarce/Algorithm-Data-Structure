@@ -9,13 +9,19 @@ typedef enum Dim_t{
     COLUMN
 }Dim_t;
 
-typedef struct Max_Dim_t
+
+typedef struct stack_t
 {
-    int  n_rows;
-    int  n_cols;
-    int  area;
-    bool reverse;
-}Max_Dim_t;
+    int index;
+    int memory[];
+}stack_t;
+
+stack_t *create_stack(int dim);
+void delete_stack(stack_t *s);
+void empty_stack(stack_t *s);
+bool is_empty(stack_t *s);
+void stack_push(stack_t *s, int elem);
+bool stack_pop(stack_t *s, int *elem);
 
 int max_submatrix(bool *matrix, int m_rows, int m_cols);
 int max_submatrix_v2_(bool *matrix, int m_rows, int m_cols, int position, int sub_m_h, int sub_m_w, Dim_t dim, int *visited);
@@ -247,148 +253,132 @@ int max_submatrix_v2_(bool *matrix, int m_rows, int m_cols, int position, int su
 
 int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
 {
-    /*
-    * In posizione 0 il massimo vettore riga, 
-    * poi quello colonna e poi quello più grande 
-    * in assoluto (che non sia una delle due precedenti)
-    */ 
-    Max_Dim_t (*max_dims)[3] = calloc(m_rows*m_cols*3,sizeof(Max_Dim_t));
-    if (!max_dims)
+    int *TOP = calloc(m_cols,sizeof(int));
+    stack_t *STACK = create_stack(m_cols);
+    if (!TOP || !STACK)
     {
-        exit(-1);
+        return -1;
     }
-
-    Max_Dim_t new_max_dim_top, new_max_dim_left;
-    int max_area = 0;
-    int temp;
     
-    for (int i = 0; i < m_rows*m_cols; i++)
+    int dummy;
+    int area = 0;
+    int max_area = 0;
+
+    for (int i = 0; i < m_rows; i++)
     {
-        // Se non trovo zero nella matrice vado avanti
-        if (matrix[i] != 0)
-            continue;
-
-        // Caso base se c'è uno zero in prima posizione nella matrice
-        if (i == 0)
+        for (int j = 0; j < m_cols; j++)
         {
-            for (int j = 0; j < 3; j++)
+            // Calcolo del j-esimo elemento della matrice TOP
+            if (matrix[i*m_cols + j] == 0)
             {
-            max_dims[i][j].n_cols = 1;
-            max_dims[i][j].n_rows = 1;
-            max_dims[i][j].area = 1;
-            }
-        }
-
-        // Caso di zero in prima riga
-        if (!LEGAL_POS(m_rows,m_cols,i-m_cols) && SAME_ROW(m_rows,m_cols,i,i-1) && i != 0)
-        {
-            // Matrice riga
-            max_dims[i][0].n_cols = max_dims[i-1][0].n_cols + 1;
-            max_dims[i][0].n_rows = 1;
-            max_dims[i][0].area = max_dims[i-1][0].area + 1;
-
-            // Matrice colonna
-            max_dims[i][1].n_cols = 1;
-            max_dims[i][1].n_rows = 1;
-            max_dims[i][1].area = 1;
-
-            // Matrice massima
-            max_dims[i][2].n_cols = max_dims[i-1][0].n_cols + 1;
-            max_dims[i][2].n_rows = 1;
-            max_dims[i][2].area = max_dims[i-1][0].area + 1;
-        }
-
-        // Caso di zero in prima colonna
-        if (!SAME_ROW(m_rows,m_cols,i,i-1) && LEGAL_POS(m_rows,m_cols,i-m_cols) && i != 0)
-        {
-            // Matrice riga
-            max_dims[i][0].n_cols = 1;
-            max_dims[i][0].n_rows = 1;
-            max_dims[i][0].area = 1;
-
-            // Matrice colonna
-            max_dims[i][1].n_cols = 1;
-            max_dims[i][1].n_rows = max_dims[i-m_cols][1].n_rows + 1;
-            max_dims[i][1].area = max_dims[i-m_cols][1].area + 1;
-
-            // Matrice massima
-            max_dims[i][2].n_cols = 1;
-            max_dims[i][2].n_rows = max_dims[i-m_cols][1].n_rows + 1;
-            max_dims[i][2].area = max_dims[i-m_cols][1].area + 1;
-        }
-
-        // Caso di zero centrale
-        if (SAME_ROW(m_rows,m_cols,i,i-1) && LEGAL_POS(m_rows,m_cols,i-m_cols))
-        {
-            // Matrice riga
-            max_dims[i][0].n_cols = max_dims[i-1][0].n_cols + 1;
-            max_dims[i][0].n_rows = 1;
-            max_dims[i][0].area = max_dims[i-1][0].area + 1;
-
-            // Matrice colonna
-            max_dims[i][1].n_cols = 1;
-            max_dims[i][1].n_rows = max_dims[i-m_cols][1].n_rows + 1;
-            max_dims[i][1].area = max_dims[i-m_cols][1].area + 1;
-
-            Max_Dim_t temp_top;
-            int temp_top_area = 0;
-            // Confronto del top con i 3 left per trovare il migliore
-            for (int l = 0; l < 3; l++)
-            {
-                // Matrice massima da sopra
-                temp_top.n_rows = max_dims[i-m_cols][l].n_rows + 1;
-                temp_top.n_cols = MIN(max_dims[i-m_cols][l].n_cols,max_dims[i-1][l].n_cols + 1) == 0 ? 1 : MIN(max_dims[i-m_cols][l].n_cols,max_dims[i-1][l].n_cols + 1);
-                temp_top.area = temp_top.n_rows * temp_top.n_cols;
-                
-                if (temp_top.area > temp_top_area)
-                {
-                    new_max_dim_top = temp_top;
-                    temp_top_area = temp_top.area;
-                }
-            }
-
-            Max_Dim_t temp_left;
-            int temp_left_area = 0;
-            // Confronto del top con i 3 left per trovare il migliore
-            for (int l = 0; l < 3; l++)
-            {
-                // Matrice massima da sinistra
-                temp_left.n_rows = MIN(max_dims[i-1][l].n_rows,max_dims[i-m_cols][l].n_rows + 1) == 0 ? 1 : MIN(max_dims[i-1][l].n_rows,max_dims[i-m_cols][l].n_rows + 1);
-                temp_left.n_cols = max_dims[i-1][l].n_cols + 1;
-                temp_left.area = temp_left.n_rows * temp_left.n_cols;
-                
-                if (temp_left.area > temp_left_area)
-                {
-                    new_max_dim_left = temp_left;
-                    temp_left_area = temp_left.area;
-                }
-            }
-
-            // Salvataggio dell'effettivo massimo
-            if (new_max_dim_top.area >= new_max_dim_left.area)
-            {
-                max_dims[i][2].n_rows = new_max_dim_top.n_rows;
-                max_dims[i][2].n_cols = new_max_dim_top.n_cols;
-                max_dims[i][2].area = new_max_dim_top.area;
+                if (LEGAL_POS(m_rows,m_cols,(i-1)*m_cols + j))
+                    TOP[j] = TOP[j] + 1;
+                else
+                    TOP[j] = 1;
             }
             else
             {
-                max_dims[i][2].n_rows = new_max_dim_left.n_rows;
-                max_dims[i][2].n_cols = new_max_dim_left.n_cols;
-                max_dims[i][2].area = new_max_dim_left.area;
+                TOP[j] = 0;
             }
             
+            // Calcolo della maggiore area possibile
+            if (j == 0)
+            {
+                stack_push(STACK,j);
+                continue;
+            }
+
+            if (TOP[j] == 0)
+            {
+                int index = 0;
+                while (!is_empty(STACK))
+                {
+                    stack_pop(STACK,&index);
+                    area = TOP[j-1]*(j-index);
+                    if (area > max_area)
+                        max_area = area;
+                    
+                }
+            }
+            else if (TOP[j] > TOP[j-1])
+            {
+                stack_push(STACK,j);
+            }
+            else if (TOP[j] < TOP[j-1])
+            {
+                int index = 0;
+                stack_pop(STACK,&index);
+                area = TOP[j-1]*(j-index);
+                if (area > max_area)
+                    max_area = area;
+
+                stack_push(STACK,index);
+            }
+
         }
-        
-        temp = MAX(max_dims[i][0].area,MAX(max_dims[i][1].area,max_dims[i][2].area));
-        if (temp > max_area)
+
+        //Stampo TOP ad ogni riga
+        /*
+        for (int i = 0; i < m_cols; i++)
         {
-            max_area = temp;
+            printf("%d ",TOP[i]);
         }
+        printf("\n");
+        */
+        
 
+
+        // Calcolo con eventuali residui nello stack
+        int index = 0;
+        while (!is_empty(STACK))
+        {
+            stack_pop(STACK,&index);
+            area = TOP[m_cols-1]*(m_cols-index);
+            if (area > max_area)
+                max_area = area;
+            
+        }
     }
-   
-    //printMaxDimMatrix(max_dims,m_rows,m_cols);
-    return max_area;
 
+    free(TOP);
+    delete_stack(STACK);
+
+    return max_area;    
+}
+
+
+stack_t *create_stack(int dim)
+{
+    stack_t *s = calloc(1,sizeof(stack_t)+dim);
+    return s;
+}
+
+void delete_stack(stack_t *s)
+{
+    free(s);
+}
+
+void empty_stack(stack_t *s)
+{
+    s->index = 0;
+}
+
+bool is_empty(stack_t *s)
+{
+    return s->index == 0;
+}
+void stack_push(stack_t *s, int elem)
+{
+    s->memory[s->index] = elem;
+    s->index = s->index + 1;
+}
+
+bool stack_pop(stack_t *s, int *elem)
+{
+    if (is_empty(s))
+        return false;
+    
+    s->index = s->index - 1;
+    *elem = s->memory[s->index];
+    return true;
 }
