@@ -13,6 +13,7 @@ typedef enum Dim_t{
 typedef struct stack_t
 {
     int index;
+    int dim;
     int memory[];
 }stack_t;
 
@@ -35,9 +36,9 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols);
 #define MAX(one, two) ((one) > (two) ? (one) : (two))
 #define MIN(one, two) ((one) < (two) ? (one) : (two))
 
-#define MAX_TESTS 100000
-#define MAX_ROWS 50
-#define MAX_COLS 50
+#define MAX_TESTS 1
+#define MAX_ROWS 5000
+#define MAX_COLS 5000
 #define ONES_QNT 1/2
 int main(){
 
@@ -251,10 +252,9 @@ int max_submatrix_v2_(bool *matrix, int m_rows, int m_cols, int position, int su
     }
 }
 
-
 int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
 {
-    int *TOP = calloc(m_cols,sizeof(int));
+    int *TOP = malloc(sizeof(int)*m_cols);
     stack_t *STACK_indexes = create_stack(m_cols);
     stack_t *STACK_values = create_stack(m_cols);
     if (!TOP || !STACK_indexes || !STACK_values)
@@ -265,76 +265,49 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
     int dummy;
     int area = 0;
     int max_area = 0;
+    int index, value;
 
     for (int i = 0; i < m_rows; i++)
     {
-        for (int j = 0; j < m_cols; j++)
+        // Calcolo dello 0-esimo elemento della matrice TOP
+        if (matrix[i*m_cols] == 0)
+            LEGAL_POS(m_rows,m_cols,(i-1)*m_cols) ? (TOP[0] = TOP[0] + 1) : (TOP[0] = 1);
+        else
+            TOP[0] = 0;
+
+        stack_push(STACK_values,TOP[0]);
+        stack_push(STACK_indexes,0);
+
+        for (int j = 1; j < m_cols; j++)
         {
-            // Calcolo del j-esimo elemento della matrice TOP
+            // Calcolo dello j-esimo elemento della matrice TOP
             if (matrix[i*m_cols + j] == 0)
-            {
-                if (LEGAL_POS(m_rows,m_cols,(i-1)*m_cols + j))
-                    TOP[j] = TOP[j] + 1;
-                else
-                    TOP[j] = 1;
-            }
+                LEGAL_POS(m_rows,m_cols,(i-1)*m_cols + j) ? (TOP[j] = TOP[j] + 1) : (TOP[j] = 1);
             else
-            {
                 TOP[j] = 0;
-            }
-            
-            // Calcolo della maggiore area possibile
-            if (j == 0 && TOP[j] != 0)
+
+            // Calcolo della massima area
+            index = j;
+            value = TOP[j];
+            while (!is_empty(STACK_indexes) && !is_empty(STACK_values) && TOP[j] < stack_head(STACK_values))
             {
-                stack_push(STACK_values,TOP[j]);
-                stack_push(STACK_indexes,j);
-                continue;
+                stack_pop(STACK_indexes,&index);
+                stack_pop(STACK_values,&value);
+                area = value*(j-index);
+                if (area > max_area)
+                    max_area = area;
             }
 
-            if (TOP[j] > TOP[j-1])
-            {
-                stack_push(STACK_values,TOP[j]);
-                stack_push(STACK_indexes,j);
-            }
-            else if (TOP[j] < TOP[j-1])
-            {
-                int index = 0;
-                int value = 0;
-                while (!is_empty(STACK_indexes) && !is_empty(STACK_values) && TOP[j] < stack_head(STACK_values))
-                {
-                    stack_pop(STACK_indexes,&index);
-                    stack_pop(STACK_values,&value);
-                    area = value*(j-index);
-                    //printf("Ho calcolato area di %d\n",area);
-                    if (area > max_area)
-                        max_area = area;
-                }
-                stack_push(STACK_indexes,index);
-                stack_push(STACK_values,TOP[j]);
-            }
-            
-
+            stack_push(STACK_values,TOP[j]);
+            stack_push(STACK_indexes,index);
         }
 
-        //Stampo TOP ad ogni riga
-        /*
-        for (int i = 0; i < m_cols; i++)
-        {
-            printf("%d ",TOP[i]);
-        }
-        printf("\n");
-        */
-
-
-        // Calcolo con eventuali residui nello stack
-        int index = 0;
-        int value = 0;
+        // Calcolo della massima area con valori residui nello stack
         while (!is_empty(STACK_indexes) && !is_empty(STACK_values))
         {
             stack_pop(STACK_indexes,&index);
             stack_pop(STACK_values,&value);
             area = value*(m_cols-index);
-            //printf("**Ho calcolato area di %d\n",area);
             if (area > max_area)
                 max_area = area;
         }
@@ -344,13 +317,14 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
     delete_stack(STACK_indexes);
     delete_stack(STACK_values);
 
-    return max_area;    
+    return max_area;
 }
-
 
 stack_t *create_stack(int dim)
 {
-    stack_t *s = calloc(1,sizeof(stack_t)+dim);
+    stack_t *s = malloc(sizeof(stack_t)+sizeof(int)*dim);
+    s->index = 0;
+    s->dim = dim;
     return s;
 }
 
@@ -368,6 +342,7 @@ bool is_empty(stack_t *s)
 {
     return s->index == 0;
 }
+
 void stack_push(stack_t *s, int elem)
 {
     s->memory[s->index] = elem;
