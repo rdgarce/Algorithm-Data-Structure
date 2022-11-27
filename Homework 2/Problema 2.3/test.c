@@ -22,6 +22,7 @@ void empty_stack(stack_t *s);
 bool is_empty(stack_t *s);
 void stack_push(stack_t *s, int elem);
 bool stack_pop(stack_t *s, int *elem);
+int stack_head(stack_t *s);
 
 int max_submatrix(bool *matrix, int m_rows, int m_cols);
 int max_submatrix_v2_(bool *matrix, int m_rows, int m_cols, int position, int sub_m_h, int sub_m_w, Dim_t dim, int *visited);
@@ -34,9 +35,9 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols);
 #define MAX(one, two) ((one) > (two) ? (one) : (two))
 #define MIN(one, two) ((one) < (two) ? (one) : (two))
 
-#define MAX_TESTS 10000000
-#define MAX_ROWS 7
-#define MAX_COLS 7
+#define MAX_TESTS 100000
+#define MAX_ROWS 50
+#define MAX_COLS 50
 #define ONES_QNT 1/2
 int main(){
 
@@ -254,8 +255,9 @@ int max_submatrix_v2_(bool *matrix, int m_rows, int m_cols, int position, int su
 int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
 {
     int *TOP = calloc(m_cols,sizeof(int));
-    stack_t *STACK = create_stack(m_cols);
-    if (!TOP || !STACK)
+    stack_t *STACK_indexes = create_stack(m_cols);
+    stack_t *STACK_values = create_stack(m_cols);
+    if (!TOP || !STACK_indexes || !STACK_values)
     {
         return -1;
     }
@@ -282,38 +284,35 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
             }
             
             // Calcolo della maggiore area possibile
-            if (j == 0)
+            if (j == 0 && TOP[j] != 0)
             {
-                stack_push(STACK,j);
+                stack_push(STACK_values,TOP[j]);
+                stack_push(STACK_indexes,j);
                 continue;
             }
 
-            if (TOP[j] == 0)
+            if (TOP[j] > TOP[j-1])
             {
-                int index = 0;
-                while (!is_empty(STACK))
-                {
-                    stack_pop(STACK,&index);
-                    area = TOP[j-1]*(j-index);
-                    if (area > max_area)
-                        max_area = area;
-                    
-                }
-            }
-            else if (TOP[j] > TOP[j-1])
-            {
-                stack_push(STACK,j);
+                stack_push(STACK_values,TOP[j]);
+                stack_push(STACK_indexes,j);
             }
             else if (TOP[j] < TOP[j-1])
             {
                 int index = 0;
-                stack_pop(STACK,&index);
-                area = TOP[j-1]*(j-index);
-                if (area > max_area)
-                    max_area = area;
-
-                stack_push(STACK,index);
+                int value = 0;
+                while (!is_empty(STACK_indexes) && !is_empty(STACK_values) && TOP[j] < stack_head(STACK_values))
+                {
+                    stack_pop(STACK_indexes,&index);
+                    stack_pop(STACK_values,&value);
+                    area = value*(j-index);
+                    //printf("Ho calcolato area di %d\n",area);
+                    if (area > max_area)
+                        max_area = area;
+                }
+                stack_push(STACK_indexes,index);
+                stack_push(STACK_values,TOP[j]);
             }
+            
 
         }
 
@@ -325,23 +324,25 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
         }
         printf("\n");
         */
-        
 
 
         // Calcolo con eventuali residui nello stack
         int index = 0;
-        while (!is_empty(STACK))
+        int value = 0;
+        while (!is_empty(STACK_indexes) && !is_empty(STACK_values))
         {
-            stack_pop(STACK,&index);
-            area = TOP[m_cols-1]*(m_cols-index);
+            stack_pop(STACK_indexes,&index);
+            stack_pop(STACK_values,&value);
+            area = value*(m_cols-index);
+            //printf("**Ho calcolato area di %d\n",area);
             if (area > max_area)
                 max_area = area;
-            
         }
     }
 
     free(TOP);
-    delete_stack(STACK);
+    delete_stack(STACK_indexes);
+    delete_stack(STACK_values);
 
     return max_area;    
 }
@@ -381,4 +382,9 @@ bool stack_pop(stack_t *s, int *elem)
     s->index = s->index - 1;
     *elem = s->memory[s->index];
     return true;
+}
+
+int stack_head(stack_t *s)
+{
+    return s->memory[s->index-1];
 }

@@ -25,24 +25,20 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols);
 #define MIN(one, two) ((one) < (two) ? (one) : (two))
 
 /*
-1 0 0 
-0 1 0 
-0 0 1 
-1 0 0 
-1 1 1
+0 0 0
+1 0 1
+1 0 1
 */
 
 int main(){
 
     bool m[] = {
-            0,0,1,
-            1,0,0,
-            1,0,0,
-            1,1,0,
-            0,1,1
+            0,0,0,
+            1,0,1,
+            1,0,1
             };
     
-    int res = max_sub_matrix_size(m,5,3);
+    int res = max_sub_matrix_size(m,3,3);
     printf("RES: %d\n",res);
 }
 
@@ -78,7 +74,7 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
             }
             
             // Calcolo della maggiore area possibile
-            if (j == 0)
+            if (j == 0 && TOP[j] != 0)
             {
                 stack_push(STACK_values,TOP[j]);
                 stack_push(STACK_indexes,j);
@@ -99,19 +95,25 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
                     stack_pop(STACK_indexes,&index);
                     stack_pop(STACK_values,&value);
                     area = value*(j-index);
+                    printf("Ho calcolato area di %d\n",area);
                     if (area > max_area)
                         max_area = area;
                 }
+                stack_push(STACK_indexes,index);
+                stack_push(STACK_values,TOP[j]);
             }
+            
 
         }
 
         //Stampo TOP ad ogni riga
+        
         for (int i = 0; i < m_cols; i++)
         {
             printf("%d ",TOP[i]);
         }
         printf("\n");
+        
 
 
         // Calcolo con eventuali residui nello stack
@@ -122,6 +124,7 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols)
             stack_pop(STACK_indexes,&index);
             stack_pop(STACK_values,&value);
             area = value*(m_cols-index);
+            printf("**Ho calcolato area di %d\n",area);
             if (area > max_area)
                 max_area = area;
         }
