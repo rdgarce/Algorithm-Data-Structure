@@ -1,17 +1,61 @@
+#include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <limits.h>
 
-/*
-* Apply mergesort on the int vector [A] starting 
-* from the [start] index to the [end] index.
-* If [num_op] != NULL, then the number of exchanges
-* performed by the algorithm will be copied in [num_op]
-*/
 void mergeSort(int *A, int start, int end, int *num_op);
-void _merge(int *A, int start, int center,int end, int *num_op);
 void _merge_sort(int *A, int start, int end, int *num_op);
+void _merge(int *A, int start, int center,int end, int *num_op);
 void printArray(int *A, int len);
+int binary_search(int *A, int start, int end, int elem);
+
+#define MAX_SIZE 10000
+
+int main(){
+
+    char buffer[64];
+    int size;
+    int array[MAX_SIZE];
+    int money;
+    int min_diff;
+
+    int found_index;
+
+    int final_v_1, final_v_2;
+
+    while ((fgets(buffer,sizeof(buffer),stdin) != NULL) && buffer[0] != '\n')
+    {
+        sscanf(buffer,"%d",&size);
+        for (int i = 0; i < size; i++)
+        {
+            scanf("%d",&array[i]);
+        }
+        scanf("%d",&money);
+        
+        min_diff = money;
+        mergeSort(array,0,size-1,NULL);
+
+        for (int i = 0; i < size; i++)
+        {
+            found_index = binary_search(array,0,size-1,money-array[i]);
+            if (found_index == -1)
+                continue;
+            
+            if (abs(array[found_index] - array[i]) < min_diff)
+            {
+                min_diff = abs(array[found_index] - array[i]);
+                final_v_1 = array[i];
+                final_v_2 = array[found_index];
+            }
+        }
+        printf("Peter should buy books whose prices are %d and %d.\n\n",final_v_1,final_v_2);
+        
+        
+    }
+    
+    
+
+}
+
 
 void _merge(int *A, int start, int center,int end, int *num_op){
     
