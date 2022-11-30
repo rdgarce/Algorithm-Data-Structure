@@ -31,23 +31,22 @@ int main()
     Event_type_t ev_t;
     int ev_val;
 
-    while (fgets(buffer,sizeof(buffer),stdin) != NULL)
+    while (1)
     {
         // Leggo la distanza dell'evento
-        sscanf(buffer, "%d", &ev_distance);
+        scanf("%d", &ev_distance);
 
         // Leggo il tipo di evento
-        sscanf(buffer,"%s",dummy);
-        printf("%c",dummy[5]);
+        scanf("%s",buffer);
 
-        if (dummy[0] == 'F')
+        if (buffer[0] == 'F')
         {
             // Fuel consumption
             // Leggo "consumption"
-            sscanf(buffer,"%s",dummy);
+            scanf("%s",buffer);
 
             // Leggo il valore
-            sscanf(buffer,"%d",&ev_val);
+            scanf("%d",&ev_val);
 
             if (ev_distance == 0 && ev_val == 0)
             {
@@ -59,48 +58,35 @@ int main()
             Events[ev_size].event_type = FUEL_CONSUMPTION;
             ev_size++;
         }
-        else if (dummy[0] == 'L')
+        else if (buffer[0] == 'L')
         {
             // Leak
-            // Leggo il valore
-            sscanf(buffer,"%d",&ev_val);
-            
             Events[ev_size].distance = ev_distance;
             Events[ev_size].event_val = ev_val;
             Events[ev_size].event_type = LEAK;
             ev_size++;
         }
-        else if (dummy[0] == 'G' && dummy[1] == 'a')
+        else if (buffer[0] == 'G' && buffer[1] == 'a')
         {
             // Gas station
             // Leggo "station"
-            sscanf(buffer,"%s",dummy);
-
-            // Leggo il valore
-            sscanf(buffer,"%d",&ev_val);
-
+            scanf("%s",dummy);
             Events[ev_size].distance = ev_distance;
             Events[ev_size].event_val = ev_val;
             Events[ev_size].event_type = GAS_STATION;
             ev_size++;
         }
-        else if (dummy[0] == 'M')
+        else if (buffer[0] == 'M')
         {
             // Mechanic
-            // Leggo il valore
-            sscanf(buffer,"%d",&ev_val);
-            
             Events[ev_size].distance = ev_distance;
             Events[ev_size].event_val = ev_val;
             Events[ev_size].event_type = MECHANIC;
             ev_size++;
         }
-        else if (dummy[0] == 'G' && dummy[1] == 'o')
+        else if (buffer[0] == 'G' && buffer[1] == 'o')
         {
             // Goal
-            // Leggo il valore
-            sscanf(buffer,"%d",&ev_val);
-            
             Events[ev_size].distance = ev_distance;
             Events[ev_size].event_val = ev_val;
             Events[ev_size].event_type = GOAL;
@@ -110,14 +96,7 @@ int main()
             printf("%.3f\n",res);
             ev_size = 0;
         }
-        
-
     }
-    
-
-
-    float res = min_fuel_consumption(Events,2);
-    printf("%.3f\n",res);
 
 }
 
@@ -131,7 +110,7 @@ float min_fuel_consumption(Event_t *Events, int n_events)
 
     for (int i = 1; i < n_events; i++)
     {
-        current_fuel_needed = current_fuel_needed + Events[i].distance * (f_p_k + n_leaks);
+        current_fuel_needed = current_fuel_needed + (Events[i].distance-Events[i-1].distance) * (f_p_k + n_leaks);
         
         if (current_fuel_needed > min_fuel_needed)
             min_fuel_needed = current_fuel_needed;
