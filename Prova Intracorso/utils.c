@@ -13,9 +13,8 @@ void _merge(int *A, int start, int center,int end, int *num_op);
 void _merge_sort(int *A, int start, int end, int *num_op);
 void printArray(int *A, int len);
 
-void _merge(int *A, int start, int center,int end, int *num_op){
-    
-
+void _merge(int *A, int start, int center,int end, int *num_op)
+{
     int n1 = center-start+1;
     int n2 = end-center;
     int op_count = 0;
@@ -35,22 +34,21 @@ void _merge(int *A, int start, int center,int end, int *num_op){
 
     int l_index = 0;
     int r_index = 0;
-    for(int i=start;i <= end; i++){
-        
-        if(L[l_index] <= R[r_index]){
+    for(int i=start;i <= end; i++)
+    {    
+        if(L[l_index] <= R[r_index])
+        {
             A[i] = L[l_index];
             l_index++;
         }
-        else{
+        else
+        {
             A[i] = R[r_index];
             r_index++;
             if(L[l_index] != INT_MAX)
-                op_count += n1-l_index;
-                
+                op_count += n1-l_index;  
         }
-        
     }
-    
 
     if(num_op)
         *num_op += op_count;
@@ -59,38 +57,35 @@ void _merge(int *A, int start, int center,int end, int *num_op){
     free(R);
 }
 
-void _merge_sort(int *A, int start, int end, int *num_op){
-    
-    if(start < end){
-        
+void _merge_sort(int *A, int start, int end, int *num_op)
+{    
+    if(start < end)
+    {       
         int center = (start + end)/2;
         _merge_sort(A,start,center, num_op);
         _merge_sort(A, center+1,end, num_op);
-        _merge(A,start,center,end, num_op);
-        
+        _merge(A,start,center,end, num_op);    
     }
-
 }
 
-void mergeSort(int *A, int start, int end, int *num_op){
+void mergeSort(int *A, int start, int end, int *num_op)
+{
     int n_op = 0;
     _merge_sort(A,start,end,&n_op);
     if (num_op)
     {
         *num_op = n_op;
-    }
-    
+    }    
 }
 
-void printArray(int *A, int len){
-    
+void printArray(int *A, int len)
+{
     printf("[ ");
     for (int i = 0; i < len; i++)
     {
         printf("%d ",A[i]);
     }
     printf("]\n");
-    
 }
 
 /*
