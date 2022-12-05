@@ -22,8 +22,8 @@ bool is_palindrome(char *string, size_t s_size, bool *removed, unsigned int n_re
 
 int main()
 {
-    bool removed[] = {false,false,false};
-    printf("%d\n",is_palindrome("aba",3,&removed, 0));
+    bool removed[50] = {false};
+    printf("%d\n",is_palindrome("q",0,&removed, 0));
 }
 
 int max_pal_sub_seq(char *string, size_t s_size, bool *removed, unsigned int n_removed)
@@ -37,22 +37,18 @@ int max_pal_sub_seq(char *string, size_t s_size, bool *removed, unsigned int n_r
 
 bool is_palindrome(char *string, size_t s_size, bool *removed, unsigned int n_removed)
 {
-    if (s_size == 1 || s_size == 0)
-        return true;
-
     unsigned int actual_size = s_size - n_removed;
 
     if (actual_size % 2 != 0)
     {
         int count = 0;
         int index = -1;
-        while (count < actual_size/2 && index < s_size)
+        while (count <= actual_size/2 && index < (int)s_size)
         {
             index++;
             if (!removed[index])
                 count++;
         }
-        printf("Sto rimuovendo in indice %d\n",index);
         removed[index] = true;
         bool res = is_palindrome(string,s_size,removed,n_removed+1);
         removed[index] = false;
@@ -84,7 +80,6 @@ bool is_palindrome(char *string, size_t s_size, bool *removed, unsigned int n_re
         return false;
     }
 }
-
 
 stack_t *create_stack(int dim)
 {
