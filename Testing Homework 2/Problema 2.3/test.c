@@ -36,9 +36,9 @@ int max_sub_matrix_size(bool *matrix, int m_rows, int m_cols);
 #define MAX(one, two) ((one) > (two) ? (one) : (two))
 #define MIN(one, two) ((one) < (two) ? (one) : (two))
 
-#define MAX_TESTS 1
-#define MAX_ROWS 5000
-#define MAX_COLS 5000
+#define MAX_TESTS 1000
+#define MAX_ROWS 50
+#define MAX_COLS 50
 #define ONES_QNT 1/2
 int main(){
 
