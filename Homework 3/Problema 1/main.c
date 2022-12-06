@@ -23,16 +23,35 @@ bool is_palindrome(char *string, size_t s_size, bool *removed, unsigned int n_re
 int main()
 {
     bool removed[50] = {false};
-    printf("%d\n",is_palindrome("q",0,&removed, 0));
+    printf("%d\n",max_pal_sub_seq("ilahiubbal",10,&removed,0));
 }
 
 int max_pal_sub_seq(char *string, size_t s_size, bool *removed, unsigned int n_removed)
 {
+    // Caso base: Ho trovato un palindromo, quindi ritorno la lunghezza e la salvo
     if (is_palindrome(string,s_size,removed,n_removed))
     {
-        
+        // Devo anche fare memoization
+        return s_size-n_removed;
     }
-    
+
+    unsigned int max_length = 0;
+    unsigned int temp_length;
+
+    for (int i = 0; i < s_size; i++)
+    {
+        if (removed[i])
+            continue;
+        
+        removed[i] = true;
+        temp_length = max_pal_sub_seq(string,s_size,removed,n_removed+1);
+        removed[i] = false;
+        if (temp_length > max_length)
+            max_length = temp_length;
+    }
+
+    // Memoization del risultato trovato e lo ritorno
+    return max_length;
 }
 
 bool is_palindrome(char *string, size_t s_size, bool *removed, unsigned int n_removed)
