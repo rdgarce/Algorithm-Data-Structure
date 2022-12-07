@@ -1,145 +1,84 @@
+/*
+
+Soluzione:
+Il problema viene risolto mediante la programmazione dinamica.
+
+Di seguito i 5 step dell'analisi che è stata fatta:
+1) Il sottoproblema è quello di trovare la più lunga sottosequenza
+   palindroma nella sottostringa [i:j]
+   1.1) Il numero dei sottoproblemi è N^2 dove N è la lunghezza della stringa
+2) Se stringa[i] == stringa[j] non ci sono scelte da fare, altrimenti si sceglie
+   il massimo risultato ottenuto tra il sottoproblema DP(i+1,j) e DP(i,j-1)
+   2.1) Il numero di scelte è <= 2, quindi il tempo per sottoproblema è O(1)
+3) La ricorrenza è la seguente:
+   DP(i,j) = {
+                2 + DP(i+1,j-1), se stringa[i] == stringa[j]
+                max{DP(i+1,j), DP(i,j-1)}, se stringa[i] != stringa[j]
+             }
+   Caso base: DP(k,k) = 1
+4) Il grafo dei sottoproblemi è aciclico e il tempo totale di eseguzione è O(1)*N^2 = O(N^2)
+5) Il problema originario viene risolto con DP(0,N-1)
+
+*/
+
 #include <stdlib.h>
-#include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
-typedef struct stack_t
-{
-    int index;
-    int dim;
-    int memory[];
-}stack_t;
+#define MAX(one, two) ((one) >= (two) ? (one) : (two))
 
-stack_t *create_stack(int dim);
-void delete_stack(stack_t *s);
-void empty_stack(stack_t *s);
-bool is_empty(stack_t *s);
-void stack_push(stack_t *s, int elem);
-bool stack_pop(stack_t *s, int *elem);
-int stack_head(stack_t *s);
-
-int max_pal_sub_seq(char *string, size_t s_size, bool *removed, unsigned int n_removed);
-bool is_palindrome(char *string, size_t s_size, bool *removed, unsigned int n_removed);
+int max_pal_sub_seq(char *string);
 
 int main()
 {
-    bool removed[50] = {false};
-    printf("%d\n",max_pal_sub_seq("ilahiubbal",10,&removed,0));
+    char buf[128];
+    int n_tests;
+    
+    printf("Inserire il numero di casi di test\n");
+    scanf("%d",&n_tests);
+    for (int i = 0; i < n_tests; i++)
+    {
+        printf("Inserire la stringa del #%d caso di test\n", i+1);
+        scanf("%s",buf);
+        printf("La lunghezza della massima sottosequenza palindroma del #%d caso di test e': %d\n",i+1,max_pal_sub_seq(buf));
+    }
 }
 
-int max_pal_sub_seq(char *string, size_t s_size, bool *removed, unsigned int n_removed)
+/*
+* Data la stringa [string], ritorna la lunghezza della più lunga
+* sottosequenza palindroma oppure -1 se si è verificato un errore
+*/
+int max_pal_sub_seq(char *string)
 {
-    // Caso base: Ho trovato un palindromo, quindi ritorno la lunghezza e la salvo
-    if (is_palindrome(string,s_size,removed,n_removed))
-    {
-        // Devo anche fare memoization
-        return s_size-n_removed;
-    }
-
-    unsigned int max_length = 0;
-    unsigned int temp_length;
-
+    size_t s_size = strlen(string);
+    int (*memo)[s_size] = calloc(1,sizeof(int)*s_size*s_size);
+    if (!memo)
+        return -1;
+    
+    // Scrittura in memo dei casi base sulla diagonale
     for (int i = 0; i < s_size; i++)
+        memo[i][i] = 1;
+
+    for (int j = 1; j < s_size; j++)
     {
-        if (removed[i])
-            continue;
-        
-        removed[i] = true;
-        temp_length = max_pal_sub_seq(string,s_size,removed,n_removed+1);
-        removed[i] = false;
-        if (temp_length > max_length)
-            max_length = temp_length;
-    }
-
-    // Memoization del risultato trovato e lo ritorno
-    return max_length;
-}
-
-bool is_palindrome(char *string, size_t s_size, bool *removed, unsigned int n_removed)
-{
-    unsigned int actual_size = s_size - n_removed;
-
-    if (actual_size % 2 != 0)
-    {
-        int count = 0;
-        int index = -1;
-        while (count <= actual_size/2 && index < (int)s_size)
+        for (int i = j-1; i >= 0; i--)
         {
-            index++;
-            if (!removed[index])
-                count++;
+            if (string[i] != string[j])
+            {
+                memo[i][j] = MAX(memo[i+1][j],memo[i][j-1]);
+            }
+            else if (string[i] == string[j] && j-i >= 2)
+            {
+                memo[i][j] = 2 + memo[i+1][j-1];
+            }
+            else
+            {
+                memo[i][j] = 2;
+            }
         }
-        removed[index] = true;
-        bool res = is_palindrome(string,s_size,removed,n_removed+1);
-        removed[index] = false;
-        return res;         
-    }
-    
-    int dummy;
-    stack_t *stack = create_stack(s_size);
-
-    for (int i = 0; i < s_size; i++)
-    {
-        if (removed[i])
-            continue;
-        
-        if (string[i] == stack_head(stack))
-            stack_pop(stack,&dummy);
-        else
-            stack_push(stack,string[i]);
     }
 
-    if (is_empty(stack))
-    {
-        delete_stack(stack);
-        return true;
-    }
-    else
-    {
-        delete_stack(stack);
-        return false;
-    }
-}
-
-stack_t *create_stack(int dim)
-{
-    stack_t *s = calloc(1,sizeof(stack_t)+sizeof(int)*dim);
-    s->index = 0;
-    s->dim = dim;
-    return s;
-}
-
-void delete_stack(stack_t *s)
-{
-    free(s);
-}
-
-void empty_stack(stack_t *s)
-{
-    s->index = 0;
-}
-
-bool is_empty(stack_t *s)
-{
-    return s->index == 0;
-}
-
-void stack_push(stack_t *s, int elem)
-{
-    s->memory[s->index] = elem;
-    s->index = s->index + 1;
-}
-
-bool stack_pop(stack_t *s, int *elem)
-{
-    if (is_empty(s))
-        return false;
-    
-    s->index = s->index - 1;
-    *elem = s->memory[s->index];
-    return true;
-}
-
-int stack_head(stack_t *s)
-{
-    return s->memory[s->index-1];
+    int res = memo[0][s_size-1];
+    free(memo);
+    return res;
 }
