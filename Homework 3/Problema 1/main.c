@@ -1,4 +1,7 @@
 /*
+Autori:
+Arianna Vitrano: M63001171
+Raffaele del Gaudio: M63001389
 
 Soluzione:
 Il problema viene risolto mediante la programmazione dinamica.
@@ -18,6 +21,15 @@ Di seguito i 5 step dell'analisi che è stata fatta:
    Caso base: DP(k,k) = 1
 4) Il grafo dei sottoproblemi è aciclico e il tempo totale di eseguzione è O(1)*N^2 = O(N^2)
 5) Il problema originario viene risolto con DP(0,N-1)
+
+Casi di test:
+
+1) oabsndorartognfoz
+   Risultato atteso: "onorarono" di lunghezza 9
+2) radar
+   Risultato atteso: "radar" di lunghezza 5
+3) quarzo
+   Risultato atteso: "q" (o una qualsiasi altra lettera) di lunghezza 1
 
 */
 
